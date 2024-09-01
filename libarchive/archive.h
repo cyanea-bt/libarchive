@@ -1203,6 +1203,7 @@ __LA_DECL int	archive_match_include_gname_w(struct archive *,
 /* Utility functions */
 /* Convenience function to sort a NULL terminated list of strings */
 __LA_DECL int archive_utility_string_sort(char **);
+__LA_DECL int archive_utility_wstring_sort(wchar_t **);
 
 #ifdef __cplusplus
 }
