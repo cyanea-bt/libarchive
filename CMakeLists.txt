@@ -9,6 +9,26 @@ endif()
 if(POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW) #3.12.0 `check_include_file()`` and friends use ``CMAKE_REQUIRED_LIBRARIES``.
 endif()
+if(POLICY CMP0069)
+  cmake_policy(SET CMP0069 NEW) #3.9.0 INTERPROCEDURAL_OPTIMIZATION is enforced when enabled.
+  IF (MSVC_IPO)
+    # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    # CMAKE_INTERPROCEDURAL_OPTIMIZATION defaults to incremental LTCG, so have to do it manually to disable incremental
+    # ref: https://discourse.cmake.org/t/cmake-ipo-issue-msvc-ltcg-incremental/826
+    add_compile_options(/GL /Gw)
+    add_link_options(/LTCG /INCREMENTAL:NO /OPT:ICF=3)
+    message(STATUS "Enabled MSVC_IPO")
+  ENDIF (MSVC_IPO)
+endif()
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW) #3.15.0 MSVC runtime library flags are selected by an abstraction.
+  IF (MSVC_STATIC_CRT)
+    # use /MT instead of the default /MD
+    # ref: https://forum.juce.com/t/how-to-enable-msvc-static-runtime-linking-with-cmake/40917, https://forum.juce.com/t/cmake-windows-static-runtime-libs-issue/41219
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
+    message(STATUS "Enabled MSVC_STATIC_CRT")
+  ENDIF (MSVC_STATIC_CRT)
+endif()
 #
 PROJECT(libarchive C)
 #
@@ -214,7 +234,7 @@ OPTION(ENABLE_NETTLE "Enable use of Nettle" OFF)
 OPTION(ENABLE_OPENSSL "Enable use of OpenSSL" ON)
 OPTION(ENABLE_LIBB2 "Enable the use of the system LIBB2 library if found" ON)
 OPTION(ENABLE_LZ4 "Enable the use of the system LZ4 library if found" ON)
-OPTION(ENABLE_LZO "Enable the use of the system LZO library if found" OFF)
+OPTION(ENABLE_LZO "Enable the use of the system LZO library if found" ON)
 OPTION(ENABLE_LZMA "Enable the use of the system LZMA library if found" ON)
 OPTION(ENABLE_ZSTD "Enable the use of the system zstd library if found" ON)
 
@@ -228,11 +248,11 @@ OPTION(ENABLE_LIBGCC "Enable the use of the system LibGCC library if found" ON)
 # CNG is used for encrypt/decrypt Zip archives on Windows.
 OPTION(ENABLE_CNG "Enable the use of CNG(Crypto Next Generation)" ON)
 
-OPTION(ENABLE_TAR "Enable tar building" ON)
+OPTION(ENABLE_TAR "Enable tar building" OFF)
 OPTION(ENABLE_TAR_SHARED "Enable dynamic build of tar" FALSE)
-OPTION(ENABLE_CPIO "Enable cpio building" ON)
+OPTION(ENABLE_CPIO "Enable cpio building" OFF)
 OPTION(ENABLE_CPIO_SHARED "Enable dynamic build of cpio" FALSE)
-OPTION(ENABLE_CAT "Enable cat building" ON)
+OPTION(ENABLE_CAT "Enable cat building" OFF)
 OPTION(ENABLE_CAT_SHARED "Enable dynamic build of cat" FALSE)
 IF(WIN32 AND NOT CYGWIN)
 	SET(ENABLE_UNZIP FALSE)
@@ -244,7 +264,7 @@ ENDIF()
 OPTION(ENABLE_XATTR "Enable extended attribute support" ON)
 OPTION(ENABLE_ACL "Enable ACL support" ON)
 OPTION(ENABLE_ICONV "Enable iconv support" ON)
-OPTION(ENABLE_TEST "Enable unit and regression tests" ON)
+OPTION(ENABLE_TEST "Enable unit and regression tests" OFF)
 OPTION(ENABLE_COVERAGE "Enable code coverage (GCC only, automatically sets ENABLE_TEST to ON)" FALSE)
 OPTION(ENABLE_INSTALL "Enable installing of libraries" ON)
 
