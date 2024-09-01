@@ -244,10 +244,26 @@ ENDIF()
 
 # Libarchive is a shared library
 IF(BUILD_SHARED_LIBS)
-  ADD_LIBRARY(archive SHARED ${libarchive_SOURCES} ${include_HEADERS})
+  ADD_LIBRARY(archive SHARED ${libarchive_SOURCES} ${include_HEADERS} "${PROJECT_SOURCE_DIR}/version.rc")
   TARGET_INCLUDE_DIRECTORIES(archive PUBLIC .)
   TARGET_LINK_LIBRARIES(archive ${ADDITIONAL_LIBS})
   SET_TARGET_PROPERTIES(archive PROPERTIES SOVERSION ${SOVERSION})
+
+  # ref: https://stackoverflow.com/a/39258787 (comments)
+  # checking for x86/x64 on Windows. this is probably the best way?
+  IF("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
+    # ref: https://stackoverflow.com/a/36731183
+    # add C definition since we can't use preprocessor 
+    # add_definitions(-DVER_COMPANYNAME_STR="MyCompany")
+    # OR alternatively add RC_FLAGS
+    # ref: https://stackoverflow.com/a/38346103
+    SET(CMAKE_RC_FLAGS "/D _WIN32 /D WIN32 /D _MSC_VER=${MSVC_VERSION} /D _CMAKE_VER=${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
+    SET_TARGET_PROPERTIES(archive PROPERTIES PREFIX "lib")
+    SET_TARGET_PROPERTIES(archive PROPERTIES SUFFIX "_x86.dll")
+  ELSE()
+    SET(CMAKE_RC_FLAGS "/D _WIN32 /D WIN32 /D _WIN64 /D WIN64 /D _MSC_VER=${MSVC_VERSION} /D _CMAKE_VER=${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
+    SET_TARGET_PROPERTIES(archive PROPERTIES PREFIX "lib")
+  ENDIF()
 ENDIF(BUILD_SHARED_LIBS)
 
 # archive_static is a static library
