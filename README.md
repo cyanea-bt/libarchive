@@ -1,49 +1,56 @@
 # Compiling for use with libarchive-ahk
 
 You need all of the following:
-* Working MSVC / VS + CMake setup (tested on VS2019 with integrated CMake)
+* Working MSVC / VS + CMake setup (tested on VS2019 with integrated CMake v3.20+)
 * Working vcpkg setup (Don't forget to [integrate with VS](https://learn.microsoft.com/en-us/vcpkg/commands/integrate))
 * MSVC build tools, CMake & vcpkg available on the PATH
+* VCPKG_ROOT environment variable set to your vcpkg install/git directory
 
 ## Updating vcpkg
 
-First off, we'll update vcpkg and checkout a commit that is compatible with the current libarchive version.  
-E.g. [#73964f854d0d6424f335e9515b61b3a2dad5e15b](https://github.com/microsoft/vcpkg/commit/73964f854d0d6424f335e9515b61b3a2dad5e15b) works fine for v3.7.4
+First off, we'll update vcpkg.
 ```
-cd YOUR_VCPKG_GIT_DIRECTORY
+cd VCPKG_ROOT
 git pull
-git checkout 73964f854d0d6424f335e9515b61b3a2dad5e15b
 .\bootstrap-vcpkg.bat -disableMetrics
 ```
 
 ## Installing dependencies
 
-Before we can install the dependencies, you'll need to copy the custom triplet files to your vcpkg directory.  
-Find them in the "triplets" directory and copy to the appropriate location. Overwriting existing ones is optional.  
-After that open up your choice of either Developer Command Prompt (recommended) or Developer Powershell.
-```
-vcpkg install libarchive --triplet x64-windows-static-release
-vcpkg install libarchive --triplet x86-windows-static-release
-```
-We won't be using the libarchive version from vcpkg but this will install all dependencies for us.  
-Keep your Developer CMD / PS open for the next step.
+Dependencies should be compiled/installed automatically during the next step.  
+If that doesn't work, you can try to do it manually.
+<details>
+  <summary>Old method</summary>
+
+  Before we can install the dependencies, you'll need to copy the custom triplet files to your vcpkg directory.  
+  Find them in `vcpkg/triplets` and copy to `VCPKG_ROOT/triplets/community`. Overwriting existing ones is optional.  
+  After that open up your choice of either Developer Command Prompt or Developer Powershell.
+
+  ```
+  vcpkg install libarchive --triplet x64-windows-static-release
+  vcpkg install libarchive --triplet x86-windows-static-release
+  ```
+  We won't be using the libarchive version from vcpkg but this will install all dependencies for us.  
+  Keep your Developer CMD / PS open for the next step.
+</details>
 
 ## Building static libarchive dlls
 
-Adapt these commands for your VS version and VCPKG install path:
+Open your choice of either Developer Command Prompt or Developer Powershell.  
+Adapt these commands for your VS version:
 ```
 cd THIS_REPO
 
-cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_STATIC_CRT=ON -DCMAKE_TOOLCHAIN_FILE="YOUR_VCPKG_GIT_DIRECTORY\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="x64-windows-static-release" -B "build_Win64"
+cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_STATIC_CRT=ON -B "build_Win64"
 cmake --build build_Win64 --config Release
 cmake --build build_Win64 --config MinSizeRel
 
-cmake -G "Visual Studio 16 2019" -A Win32 -DMSVC_STATIC_CRT=ON -DCMAKE_TOOLCHAIN_FILE="YOUR_VCPKG_GIT_DIRECTORY\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="x86-windows-static-release" -B "build_Win32"
+cmake -G "Visual Studio 16 2019" -A Win32 -DMSVC_STATIC_CRT=ON -B "build_Win32"
 cmake --build build_Win32 --config Release
 cmake --build build_Win32 --config MinSizeRel
 ```
 And that's it. Find the compiled `libarchive.dll` / `libarchive_x86.dll` in their respective build directories.  
-Everything below here is from the original libarchive README.md
+Everything below here is from the original libarchive `README.md`
 
 ---
 

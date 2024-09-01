@@ -30,6 +30,28 @@ if(POLICY CMP0091)
   ENDIF (MSVC_STATIC_CRT)
 endif()
 #
+# use custom vcpkg triplets
+# ref: https://www.dominikgrabiec.com/cmake/2023/03/14/configuring_vcpkg_libraries_with_custom_triplet.html
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg/triplets")
+IF("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
+  IF (MSVC_STATIC_CRT)
+    set(VCPKG_TARGET_TRIPLET "x86-windows-static-release")
+  ELSE(MSVC_STATIC_CRT)
+    set(VCPKG_TARGET_TRIPLET "x86-windows-static-md-release")
+  ENDIF (MSVC_STATIC_CRT)
+ELSE()
+  IF (MSVC_STATIC_CRT)
+    set(VCPKG_TARGET_TRIPLET "x64-windows-static-release")
+  ELSE(MSVC_STATIC_CRT)
+    set(VCPKG_TARGET_TRIPLET "x64-windows-static-md-release")
+  ENDIF (MSVC_STATIC_CRT)
+ENDIF()
+IF(NOT DEFINED ENV{VCPKG_ROOT})
+  MESSAGE(FATAL_ERROR "Environment variable VCPKG_ROOT is not set!")
+ENDIF()
+file(TO_CMAKE_PATH "$ENV{VCPKG_ROOT}" VCPKG_ROOT_VAR)
+SET(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT_VAR}/scripts/buildsystems/vcpkg.cmake")
+#
 PROJECT(libarchive C)
 #
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/cmake")
