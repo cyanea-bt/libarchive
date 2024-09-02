@@ -41,11 +41,11 @@ Adapt these commands for your VS version:
 ```
 cd THIS_REPO
 
-cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_STATIC_CRT=ON -B "build_Win64"
+cmake -G "Visual Studio 16 2019" -A x64 -B "build_Win64"
 cmake --build build_Win64 --config Release
 cmake --build build_Win64 --config MinSizeRel
 
-cmake -G "Visual Studio 16 2019" -A Win32 -DMSVC_STATIC_CRT=ON -B "build_Win32"
+cmake -G "Visual Studio 16 2019" -A Win32 -B "build_Win32"
 cmake --build build_Win32 --config Release
 cmake --build build_Win32 --config MinSizeRel
 ```

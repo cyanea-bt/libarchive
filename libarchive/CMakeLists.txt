@@ -244,7 +244,7 @@ ENDIF()
 
 # Libarchive is a shared library
 IF(BUILD_SHARED_LIBS)
-  ADD_LIBRARY(archive SHARED ${libarchive_SOURCES} ${include_HEADERS} "${PROJECT_SOURCE_DIR}/version.rc")
+  ADD_LIBRARY(archive SHARED ${libarchive_SOURCES} ${include_HEADERS} "${CMAKE_SOURCE_DIR}/version.rc")
   TARGET_INCLUDE_DIRECTORIES(archive PUBLIC .)
   TARGET_LINK_LIBRARIES(archive ${ADDITIONAL_LIBS})
   SET_TARGET_PROPERTIES(archive PROPERTIES SOVERSION ${SOVERSION})

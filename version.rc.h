@@ -22,7 +22,7 @@
 #define VER_ORIGINALFILENAME_STR    "libarchive_x86.dll"
 #endif	// _WIN64
 
-#define VER_COMPANYNAME_STR         "https://github.com/libarchive/libarchive"
+#define VER_COMPANYNAME_STR         "https://github.com/cyanea-bt/libarchive/tree/autohotkey"
 #define VER_INTERNALNAME_STR        "archive"
 #define VER_PRODUCTNAME_STR         "libarchive"
 #define VER_COMMENTS_STR            "Static build using MSVC " STRINGIZE(_MSC_VER) "/CMake " STRINGIZE(_CMAKE_VER) "/vcpkg"

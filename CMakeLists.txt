@@ -22,12 +22,17 @@ if(POLICY CMP0069)
 endif()
 if(POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW) #3.15.0 MSVC runtime library flags are selected by an abstraction.
+  IF (NOT DEFINED MSVC_STATIC_CRT)
+    SET(MSVC_STATIC_CRT ON)
+  ENDIF(NOT DEFINED MSVC_STATIC_CRT)
   IF (MSVC_STATIC_CRT)
     # use /MT instead of the default /MD
     # ref: https://forum.juce.com/t/how-to-enable-msvc-static-runtime-linking-with-cmake/40917, https://forum.juce.com/t/cmake-windows-static-runtime-libs-issue/41219
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
     message(STATUS "Enabled MSVC_STATIC_CRT")
   ENDIF (MSVC_STATIC_CRT)
+else()
+  MESSAGE(FATAL_ERROR "CMake version is too old. Upgrade to 3.15 or higher!")
 endif()
 #
 # use custom vcpkg triplets
@@ -288,7 +293,7 @@ OPTION(ENABLE_ACL "Enable ACL support" ON)
 OPTION(ENABLE_ICONV "Enable iconv support" ON)
 OPTION(ENABLE_TEST "Enable unit and regression tests" OFF)
 OPTION(ENABLE_COVERAGE "Enable code coverage (GCC only, automatically sets ENABLE_TEST to ON)" FALSE)
-OPTION(ENABLE_INSTALL "Enable installing of libraries" ON)
+OPTION(ENABLE_INSTALL "Enable installing of libraries" OFF)
 
 SET(POSIX_REGEX_LIB "AUTO" CACHE STRING "Choose what library should provide POSIX regular expression support")
 SET(ENABLE_SAFESEH "AUTO" CACHE STRING "Enable use of /SAFESEH linker flag (MSVC only)")
